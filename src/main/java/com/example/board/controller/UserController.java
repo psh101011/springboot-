@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
     
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder; // ✅ 여길 이렇게 변경!
+    private final BCryptPasswordEncoder passwordEncoder; // ✅ 여길 이렇게 변경!
 
     //home 화면
     @GetMapping("/")
@@ -44,7 +44,11 @@ public class UserController {
     @PostMapping("/register")
     public String register(@ModelAttribute User user){
         try {
+            System.out.println(user.getPassword());
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRole("user");
+            user.setUsername(user.getUsername());
+            System.out.println(user.getPassword());
             userRepository.save(user);
             System.out.println("✅ 사용자 저장 완료!");
         } catch (Exception e) {
