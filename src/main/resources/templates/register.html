@@ -5,6 +5,11 @@
 </head>
 <body>
     <h1>회원가입</h1>
+
+    <div th:if="${errorMessage}">
+        <p style="color:red" th:text="${errorMessage}"></p>
+    </div>
+
     <form th:action="@{/register}" th:object="${user}" method="post">
         <div>
             <label>아이디: <input type="text" th:field="*{username}" /></label>
