@@ -1,6 +1,4 @@
 package com.example.board.service;
-
-import com.example.board.domain.User;
 import com.example.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.*;
