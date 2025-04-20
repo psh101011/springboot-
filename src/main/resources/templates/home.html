@@ -4,7 +4,7 @@
     <title>홈</title>
 </head>
 <body>
-<h1>홈 페이지</h1>
+<h1>맞히 기유 즈맵</h1>
 
 <div th:if="${user != null}">
     <p th:text="'환영합니다, ' + ${user} + '님!'"></p>
@@ -19,6 +19,12 @@
     <form th:action="@{/login}" method="get">
         <div>
             <button type="submit">로그인</button>
+        </div>
+    </form>
+
+    <form th:action="@{/register}" method="get">
+        <div>
+            <button type="submit">회원가입</button>
         </div>
     </form>
 </div>
