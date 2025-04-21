@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>새 맵 만들기</title>
+</head>
+<body>
+    <h1>맵 생성</h1>
+
+    <form th:action="@{/maps/create}" th:object="${mapForm}" method="post">
+        <div>
+            <label>맵 이름:
+                <input type="text" th:field="*{mapName}" required />
+            </label>
+        </div>
+
+        <h3>퀴즈 입력</h3>
+        <div th:each="quiz, iStat : *{quizzes}">
+            <p>퀴즈 [[${iStat.index + 1}]]</p>
+            <div>
+                <label>문제:
+                    <input type="text" th:field="*{quizzes[__${iStat.index}__].question}" required />
+                </label>
+            </div>
+            <div>
+                <label>힌트:
+                    <input type="text" th:field="*{quizzes[__${iStat.index}__].hint}" required />
+                </label>
+            </div>
+            <div>
+                <label>정답:
+                    <input type="text" th:field="*{quizzes[__${iStat.index}__].answer}" required />
+                </label>
+            </div>
+            <hr/>
+        </div>
+
+        <button type="submit">맵 저장</button>
+    </form>
+</body>
+</html>
