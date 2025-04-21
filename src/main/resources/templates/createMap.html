@@ -2,35 +2,51 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>맵 생성</title>
+    <script>
+        let quizIndex = 0;
+
+        function addQuizField() {
+            const container = document.getElementById("quiz-container");
+
+            const div = document.createElement("div");
+            div.classList.add("quiz-set");
+
+            div.innerHTML = `
+                <div>
+                    <label>문제: <input type="text" name="quizzes[${quizIndex}].question" required></label>
+                </div>
+                <div>
+                    <label>힌트: <input type="text" name="quizzes[${quizIndex}].hint" required></label>
+                </div>
+                <div>
+                    <label>정답: <input type="text" name="quizzes[${quizIndex}].answer" required></label>
+                </div>
+                <hr/>
+            `;
+            container.appendChild(div);
+            quizIndex++;
+        }
+
+        window.onload = function() {
+            // 최소 1세트는 시작할 때 추가
+            addQuizField();
+        };
+    </script>
 </head>
 <body>
-    <h1>🗺️ 맵 생성</h1>
+<h1>맵 생성</h1>
 
-    <form th:action="@{/map/create}" th:object="${mapForm}" method="post">
-        <div>
-            <label>맵 제목: </label>
-            <input type="text" th:field="*{mapname}" required />
-        </div>
-        <hr/>
+<form th:action="@{/create}" method="post">
+    <div>
+        <label>맵 이름: <input type="text" name="mapName" required></label>
+    </div>
 
-        <div th:each="quiz, stat : *{quizzes}">
-            <h3>퀴즈 [[${stat.index + 1}]]</h3>
-            <div>
-                <label>문제: </label>
-                <input type="text" th:field="*{quizzes[__${stat.index}__].question}" required />
-            </div>
-            <div>
-                <label>힌트: </label>
-                <input type="text" th:field="*{quizzes[__${stat.index}__].hint}" required />
-            </div>
-            <div>
-                <label>정답: </label>
-                <input type="text" th:field="*{quizzes[__${stat.index}__].answer}" required />
-            </div>
-            <br/>
-        </div>
+    <hr/>
+    <div id="quiz-container"></div>
 
-        <button type="submit">맵 생성</button>
-    </form>
+    <button type="button" onclick="addQuizField()">퀴즈 추가</button>
+    <br/><br/>
+    <button type="submit">맵 저장</button>
+</form>
 </body>
 </html>

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/maps")
 public class MapController {
 
     private final MapRepository mapRepository;
@@ -28,15 +27,7 @@ public class MapController {
     // 맵 생성 폼
     @GetMapping("/create")
     public String createMapForm(Model model) {
-        MapForm mapForm = new MapForm();
-
-        // 기본적으로 퀴즈 10개는 미리 만들어 놓자 (추가 가능)
-        for (int i = 0; i < 10; i++) {
-            mapForm.getQuizzes().add(new QuizForm());
-        }
-
-        model.addAttribute("mapForm", mapForm);
-        return "map_form";
+        return "createMap";
     }
 
     // 맵 생성 처리
@@ -45,11 +36,13 @@ public class MapController {
      @AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
     
-    Map map = Map.builder()
-        .mapname(mapForm.getMapName())
-        .user(user)
-        .nQuiz(String.valueOf(mapForm.getQuizzes().size()))
-        .build();
+        System.out.println(user.getUsername());
+        System.out.println(mapForm);
+        Map map = Map.builder()
+            .mapname(mapForm.getMapName())
+            .user(user)
+            .nQuiz(String.valueOf(mapForm.getQuizzes().size()))
+            .build();
 
         Map savedMap = mapRepository.save(map);
 
