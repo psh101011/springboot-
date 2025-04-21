@@ -1,12 +1,22 @@
 package com.example.board.controller;
 
+import com.example.board.domain.Map;
 import com.example.board.domain.User;
+import com.example.board.repository.MapRepository;
 import com.example.board.repository.UserRepository;
 import com.example.board.service.CustomUserDetails;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
     
     private final UserRepository userRepository;
+    private final MapRepository mapRepository;
     private final BCryptPasswordEncoder passwordEncoder; // ✅ 여길 이렇게 변경!
 
     //home 화면
@@ -78,6 +89,34 @@ public class UserController {
     }
 
     
+    @PostMapping("/delete")
+    public String deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails,
+                         HttpServletRequest request,
+                         HttpServletResponse response) {
+
+        User user = userRepository.findById(userDetails.getUser().getId()).orElseThrow();
+        // 관리자 계정 불러오기
+        User admin = userRepository.findByUsername("admin")
+            .orElseThrow(() -> new IllegalStateException("관리자 계정이 없습니다."));
+
+        // 유저가 가진 맵의 소유권을 관리자에게 넘김
+        List<Map> userMaps = mapRepository.findAllByUser(user);
+        for (Map map : userMaps) {
+            map.setUser(admin);
+        }
+        mapRepository.saveAll(userMaps);
+        userRepository.deleteById(userDetails.getUser().getId());
+
+
+
+        // 스프링 시큐리티 로그아웃 처리
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+
+        return "redirect:/";
+}
 
 
 }
