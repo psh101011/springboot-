@@ -9,13 +9,13 @@
 <div th:if="${user != null}">
     <p th:text="'환영합니다, ' + ${user} + '님!'"></p>
 
-    <form th:action="@{/create}" method="get">
+    <form th:action="@{/map/create}" method="get">
         <div>
             <button type="submit">맵 생성</button>
         </div>
     </form>
 
-    <form th:action="@{/my_maps}" method="get">
+    <form th:action="@{/map/my_maps}" method="get">
         <div>
             <button type="submit">내 맵 보기</button>
         </div>

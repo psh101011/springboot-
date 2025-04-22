@@ -80,10 +80,10 @@
                 <td th:text="${map.mapname}"></td>
                 <td th:text="${map.nQuiz}"></td>
                 <td>
-                    <a th:href="@{'/edit/' + ${map.id}}" class="btn btn-edit">수정</a>
+                    <a th:href="@{'/map/edit/' + ${map.id}}" class="btn btn-edit">수정</a>
                 </td>
                 <td>
-                    <form th:action="@{'/delete/' + ${map.id}}" method="post"
+                    <form th:action="@{'/map/delete/' + ${map.id}}" method="post"
                           onsubmit="return confirm('정말 삭제하시겠습니까?');">
                         <button type="submit" class="btn btn-delete">삭제</button>
                     </form>
@@ -95,13 +95,13 @@
     <div style="text-align: center; margin-top: 20px;">
         <div th:if="${mapPage.totalPages > 1}">
             <a th:if="${currentPage > 0}"
-            th:href="@{/my_maps(page=${currentPage - 1})}"
+            th:href="@{/map/my_maps(page=${currentPage - 1})}"
             style="margin-right: 10px;">⬅ 이전</a>
 
             <span>페이지 <span th:text="${currentPage + 1}"></span> / <span th:text="${mapPage.totalPages}"></span></span>
 
             <a th:if="${currentPage + 1 < mapPage.totalPages}"
-            th:href="@{/my_maps(page=${currentPage + 1})}"
+            th:href="@{/map/my_maps(page=${currentPage + 1})}"
             style="margin-left: 10px;">다음 ➡</a>
         </div>
     </div>

@@ -7,4 +7,5 @@ import com.example.board.domain.Map;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long>{
     List<Quiz> findByMap(Map map);
+    void deleteByMap(Map map);
 }

@@ -21,11 +21,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/map")
 public class MapController {
 
     private final MapRepository mapRepository;
@@ -94,7 +96,61 @@ public class MapController {
         List<Quiz> quizzes = quizRepository.findByMap(map);
         quizRepository.deleteAll(quizzes);
         mapRepository.delete(map);
-        return "redirect:/my_maps";
+        return "redirect:/map/my_maps";
+    }
+
+    @GetMapping("/edit/{mapId}")
+    public String editMapForm(@PathVariable Long mapId,
+                        @AuthenticationPrincipal CustomUserDetails userDetails,
+                        Model model) {
+        Map map = mapRepository.findById(mapId).orElseThrow();
+
+        // 본인 맵만 삭제 가능
+        if (!map.getUser().getUsername().equals(userDetails.getUsername())) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
+
+        List<Quiz> quizzes = quizRepository.findByMap(map);
+        model.addAttribute("map", map);
+        model.addAttribute("quizzesEdit", quizzes);
+
+        return "editMap";
+    }
+
+
+    // 맵 수정 처리
+    @Transactional
+    @PostMapping("/edit/{mapId}")
+    public String editMap(@PathVariable Long mapId,
+        @ModelAttribute MapForm mapForm,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+            
+        Map map = mapRepository.findById(mapId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 맵입니다."));
+
+        // 본인 맵만 수정 가능
+        if (!map.getUser().getUsername().equals(userDetails.getUsername())) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
+
+        map.setMapname(mapForm.getMapName());
+        map.setNQuiz(String.valueOf(mapForm.getQuizzes().size()));
+
+
+        Map savedMap = mapRepository.save(map);
+
+        quizRepository.deleteByMap(map); 
+
+        for (QuizForm quizForm : mapForm.getQuizzes()) {
+            Quiz quiz = Quiz.builder()
+                    .map(savedMap)
+                    .question(quizForm.getQuestion())
+                    .hint(quizForm.getHint())
+                    .answer(quizForm.getAnswer())
+                    .build();
+            quizRepository.save(quiz);
+        }
+
+        return "redirect:/map/my_maps";
     }
 
 }
