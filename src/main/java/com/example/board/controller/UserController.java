@@ -89,7 +89,7 @@ public class UserController {
     }
 
     
-    @PostMapping("/delete")
+    @PostMapping("/withdraw")
     public String deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails,
                          HttpServletRequest request,
                          HttpServletResponse response) {

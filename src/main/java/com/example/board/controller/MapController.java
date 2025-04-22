@@ -12,6 +12,13 @@ import com.example.board.service.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,6 +36,20 @@ public class MapController {
     public String createMapForm(Model model) {
         return "createMap";
     }
+
+    @GetMapping("/my_maps")
+    public String myMaps(@AuthenticationPrincipal CustomUserDetails userDetails,
+                     @RequestParam(defaultValue = "0") int page,
+                     Model model) {
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").descending()); // 최신순 10개씩
+        Page<Map> mapPage = mapRepository.findByUser(user, pageable);
+
+        model.addAttribute("mapPage", mapPage);
+        model.addAttribute("currentPage", page);
+        return "myMaps";
+}
+
 
     // 맵 생성 처리
     @PostMapping("/create")
@@ -58,4 +79,22 @@ public class MapController {
 
         return "redirect:/";
     }
+
+
+    @PostMapping("/delete/{mapId}")
+    public String deleteMap(@PathVariable Long mapId,
+                        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map map = mapRepository.findById(mapId).orElseThrow();
+
+        // 본인 맵만 삭제 가능
+        if (!map.getUser().getUsername().equals(userDetails.getUsername())) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
+
+        List<Quiz> quizzes = quizRepository.findByMap(map);
+        quizRepository.deleteAll(quizzes);
+        mapRepository.delete(map);
+        return "redirect:/my_maps";
+    }
+
 }

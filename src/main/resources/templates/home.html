@@ -15,6 +15,13 @@
         </div>
     </form>
 
+    <form th:action="@{/my_maps}" method="get">
+        <div>
+            <button type="submit">내 맵 보기</button>
+        </div>
+    </form>
+
+
 
     <form th:action="@{/logout}" method="post">
         <div>
@@ -22,7 +29,7 @@
         </div>
     </form>
 
-    <form th:action="@{/delete}" method="post" onsubmit="return confirm('정말로 회원 탈퇴하시겠습니까?')">
+    <form th:action="@{/withdraw}" method="post" onsubmit="return confirm('정말로 회원 탈퇴하시겠습니까?')">
         <button type="submit">회원 탈퇴</button>
     </form>
 
