@@ -55,17 +55,39 @@
         }
 
         button {
-            background-color: #4CAF50;
-            color: white;
             padding: 10px 15px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-submit {
+            background-color: #4CAF50;
+            color: white;
             margin-top: 20px;
         }
 
-        button:hover {
+        .btn-submit:hover {
             background-color: #388e3c;
+        }
+
+        .btn-add {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: #1976D2;
+        }
+
+        .btn-delete {
+            background-color: #ff4d4d;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #d63031;
         }
 
         .quiz-number {
@@ -74,18 +96,75 @@
             color: #333;
         }
     </style>
+    <script>
+        function updateIndexes() {
+            const quizBlocks = document.querySelectorAll('.quiz-block');
+            quizBlocks.forEach((block, index) => {
+                block.querySelectorAll('input').forEach(input => {
+                    const name = input.getAttribute('name');
+                    if (name) {
+                        const newName = name.replace(/quizzes\[\d+\]/, `quizzes[${index}]`);
+                        input.setAttribute('name', newName);
+                    }
+
+                    const id = input.getAttribute('id');
+                    if (id && id.includes("question_")) {
+                        input.setAttribute('id', `question_${index}`);
+                    }
+                    if (id && id.includes("hint_")) {
+                        input.setAttribute('id', `hint_${index}`);
+                    }
+                    if (id && id.includes("answer_")) {
+                        input.setAttribute('id', `answer_${index}`);
+                    }
+                });
+                block.querySelector('.quiz-number').innerText = `문제${index + 1}`;
+            });
+        }
+
+        function deleteQuiz(btn) {
+            const block = btn.closest('.quiz-block');
+            block.remove();
+            updateIndexes();
+        }
+
+        function addQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            const index = document.querySelectorAll('.quiz-block').length;
+
+            const newBlock = document.createElement('div');
+            newBlock.className = 'quiz-block';
+            newBlock.innerHTML = `
+                <div class="quiz-number">문제${index + 1}</div>
+
+                <label for="question_${index}">문제</label>
+                <input type="text" name="quizzes[${index}].question" id="question_${index}" required>
+
+                <label for="hint_${index}">힌트</label>
+                <input type="text" name="quizzes[${index}].hint" id="hint_${index}" required>
+
+                <label for="answer_${index}">정답</label>
+                <input type="text" name="quizzes[${index}].answer" id="answer_${index}" required>
+
+                <button type="button" class="btn-delete" onclick="deleteQuiz(this)">삭제</button>
+            `;
+            quizContainer.appendChild(newBlock);
+        }
+    </script>
 </head>
 <body>
-    <h1>맵 수정하기</h1>
+<h1>맵 수정하기</h1>
 
-    <form th:action="@{'/map/edit/' + ${map.id}}" method="post">
-        <div class="section-title">🗺 맵 이름</div>
-        <input type="text" name="mapName" th:value="${map.mapname}" required>
+<form th:action="@{'/map/edit/' + ${map.id}}" method="post">
+    <div class="section-title">🗺 맵 이름</div>
+    <input type="text" name="mapName" th:value="${map.mapname}" required>
 
-        <div class="section-title">🧩 퀴즈 목록</div>
+    <div class="section-title">🧩 퀴즈 목록</div>
+    <div id="quiz-container">
         <div th:each="quiz, iterStat : ${quizzesEdit}" class="quiz-block">
+            <div class="quiz-number" th:text="'문제' + ${iterStat.index + 1}"></div>
 
-            <label th:for="'question_' + ${iterStat.index}">문제[[${iterStat.index + 1}]]</label>
+            <label th:for="'question_' + ${iterStat.index}">문제</label>
             <input type="text" th:name="'quizzes[' + ${iterStat.index} + '].question'"
                    th:id="'question_' + ${iterStat.index}" th:value="${quiz.question}" required>
 
@@ -98,11 +177,16 @@
                    th:id="'answer_' + ${iterStat.index}" th:value="${quiz.answer}" required>
 
             <input type="hidden" th:name="'quizzes[' + ${iterStat.index} + '].id'" th:value="${quiz.id}" />
-        </div>
 
-        <div style="text-align: center;">
-            <button type="submit">수정 완료</button>
+            <button type="button" class="btn-delete" onclick="deleteQuiz(this)">삭제</button>
         </div>
-    </form>
+    </div>
+
+    <div style="text-align: center;">
+        <button type="button" class="btn-add" onclick="addQuiz()">➕ 문제 추가</button>
+        <br>
+        <button type="submit" class="btn-submit">수정 완료</button>
+    </div>
+</form>
 </body>
 </html>

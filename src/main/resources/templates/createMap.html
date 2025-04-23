@@ -2,6 +2,95 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>맵 생성</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            width: 80%;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .quiz-set {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .remove-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .remove-btn:hover {
+            background-color: #d63031;
+        }
+
+        button {
+            margin-top: 15px;
+        }
+
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background-color: #1976D2;
+        }
+
+        .submit-btn:hover {
+            background-color: #388e3c;
+        }
+    </style>
+
     <script>
         let quizIndex = 0;
 
@@ -12,24 +101,46 @@
             div.classList.add("quiz-set");
 
             div.innerHTML = `
-                <div>
-                    <label>문제: <input type="text" name="quizzes[${quizIndex}].question" required></label>
-                </div>
-                <div>
-                    <label>힌트: <input type="text" name="quizzes[${quizIndex}].hint" required></label>
-                </div>
-                <div>
-                    <label>정답: <input type="text" name="quizzes[${quizIndex}].answer" required></label>
-                </div>
-                <hr/>
+                <button type="button" class="remove-btn" onclick="removeQuizField(this)">🗑</button>
+
+                <label>문제:
+                    <input type="text" name="quizzes[${quizIndex}].question" required>
+                </label>
+
+                <label>힌트:
+                    <input type="text" name="quizzes[${quizIndex}].hint" required>
+                </label>
+
+                <label>정답:
+                    <input type="text" name="quizzes[${quizIndex}].answer" required>
+                </label>
             `;
+
             container.appendChild(div);
             quizIndex++;
         }
 
-        window.onload = function() {
-            // 최소 1세트는 시작할 때 추가
-            addQuizField();
+        function removeQuizField(button) {
+            const container = document.getElementById("quiz-container");
+            const block = button.closest(".quiz-set");
+            block.remove();
+        
+            // 모든 퀴즈셋을 다시 순회하며 name을 재설정
+            const quizSets = container.querySelectorAll(".quiz-set");
+            quizSets.forEach((quiz, index) => {
+                quiz.querySelectorAll("input").forEach(input => {
+                    const name = input.name;
+                    const fieldType = name.substring(name.indexOf("].") + 2); // question, hint, answer
+                    input.name = `quizzes[${index}].${fieldType}`;
+                });
+            });
+        
+            // quizIndex도 다시 동기화
+            quizIndex = quizSets.length;
+        }
+
+        window.onload = function () {
+            addQuizField(); // 최소 1개 시작
         };
     </script>
 </head>
@@ -37,16 +148,15 @@
 <h1>맵 생성</h1>
 
 <form th:action="@{/map/create}" method="post">
-    <div>
-        <label>맵 이름: <input type="text" name="mapName" required></label>
-    </div>
+    <label>맵 이름:
+        <input type="text" name="mapName" required>
+    </label>
 
-    <hr/>
     <div id="quiz-container"></div>
 
-    <button type="button" onclick="addQuizField()">퀴즈 추가</button>
+    <button type="button" class="add-btn" onclick="addQuizField()">➕ 퀴즈 추가</button>
     <br/><br/>
-    <button type="submit">맵 저장</button>
+    <button type="submit" class="submit-btn">맵 저장</button>
 </form>
 </body>
 </html>
