@@ -31,7 +31,8 @@ public class UserController {
     private final MapRepository mapRepository;
     private final BCryptPasswordEncoder passwordEncoder; // ✅ 여길 이렇게 변경!
 
-    //home 화면
+    //home 
+    //화면
     @GetMapping("/")
     public String home(@AuthenticationPrincipal CustomUserDetails userDetails,Model model) {
         if (userDetails != null) {
@@ -107,8 +108,6 @@ public class UserController {
         mapRepository.saveAll(userMaps);
         userRepository.deleteById(userDetails.getUser().getId());
 
-
-
         // 스프링 시큐리티 로그아웃 처리
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null){
@@ -116,7 +115,7 @@ public class UserController {
         }
 
         return "redirect:/";
-}
+    }
 
 
 }

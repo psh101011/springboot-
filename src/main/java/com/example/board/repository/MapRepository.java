@@ -13,6 +13,6 @@ public interface MapRepository extends JpaRepository<Map, Long>{
     Optional<Map> findByMapname(String mapname);
     List<Map> findAllByUser(User user);
     Page<Map> findByUser(User user, Pageable pageable);
-    
+    Page<Map> findByMapnameContaining(String keyword, Pageable pageable);
 
 }

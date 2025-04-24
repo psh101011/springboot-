@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>대기방</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f8f8f8;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .info {
+            margin-top: 20px;
+        }
+
+        .info p {
+            margin: 8px 0;
+        }
+
+        .user-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .user-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .actions {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .start-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .leave-btn {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${room.roomName} + ' 대기방'">대기방</h1>
+
+    <div class="info">
+        <p><strong>맵 이름:</strong> <span th:text="${room.mapName}">맵 이름</span></p>
+        <p>
+            <strong>인원:</strong>
+            <span th:text="${room.currentCount}"></span> /
+            <span th:text="${room.maxCount}"></span>
+        </p>
+        <p><strong>방장:</strong> <span th:text="${room.hostUsername}">방장</span></p>
+    </div>
+
+    <div class="user-section">
+        <h3>참여자 목록</h3>
+        <ul class="user-list">
+            <li th:each="username : ${userList}" th:text="${username}">참여자</li>
+        </ul>
+    </div>
+
+    <div class="actions">
+        <form th:if="${isHost}" th:action="@{'/room/start/' + ${room.roomId}}" method="post">
+            <button type="submit" class="start-btn">게임 시작</button>
+        </form>
+
+        <form th:action="@{'/room/leave/' + ${room.roomId}}" method="post">
+            <button type="submit" class="leave-btn">나가기</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
