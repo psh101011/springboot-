@@ -29,7 +29,7 @@ public class UserController {
     
     private final UserRepository userRepository;
     private final MapRepository mapRepository;
-    private final BCryptPasswordEncoder passwordEncoder; // ✅ 여길 이렇게 변경!
+    private final BCryptPasswordEncoder passwordEncoder;
 
     //home 
     //화면

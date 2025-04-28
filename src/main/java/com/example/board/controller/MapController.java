@@ -50,7 +50,7 @@ public class MapController {
         model.addAttribute("mapPage", mapPage);
         model.addAttribute("currentPage", page);
         return "myMaps";
-}
+    }
 
 
     // 맵 생성 처리
@@ -58,9 +58,7 @@ public class MapController {
     public String saveMap(@ModelAttribute MapForm mapForm,
      @AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-    
-        System.out.println(user.getUsername());
-        System.out.println(mapForm);
+
         Map map = Map.builder()
             .mapname(mapForm.getMapName())
             .user(user)
